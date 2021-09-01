@@ -1,0 +1,67 @@
+<!--
+MIT License
+
+Copyright (c) 2021 jhnc-oss
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+-->
+
+<?jelly escape-by-default='true'?>
+<j:jelly xmlns:j="jelly:core" xmlns:l="/lib/layout" xmlns:f="/lib/form">
+    <l:layout title="Block Project">
+        <l:main-panel>
+            <f:section title="Pipeline"/>
+
+            <j:set var="projectStateAction" value="${it.blocked ? 'unblock' : 'block'}"/>
+            <f:form action="${projectStateAction}" name="${projectStateAction}" method="post">
+                <f:submit value="${it.blocked ? 'Unblock' : 'Block'}"/>
+            </f:form>
+
+            <p><i><b>Note:</b>This will override the job specific settings.</i></p>
+
+
+            <f:section title="Pipeline Jobs"/>
+
+            <table class="pane" style="width: auto;">
+                <tr>
+                    <th class="pane-header">#</th>
+                    <th class="pane-header">Job</th>
+                    <th class="pane-header">Blocked</th>
+                    <th class="pane-header"/>
+                </tr>
+                <j:forEach var="job" items="${it.jobs}" indexVar="i">
+                    <j:set var="jobBlocked" value="${it.isBlocked(job)}" />
+                    <tr>
+                        <td>${i}</td>
+                        <td><b>${job.displayName}</b></td>
+                        <td>
+                            <f:checkbox checked="${jobBlocked}" readonly="true"/>
+                        </td>
+                        <td>
+                            <j:set var="jobStateAction" value="${jobBlocked ? 'unblock' : 'block'}"/>
+                            <f:form action="${jobStateAction}Job?job=${job.name}" name="${jobStateAction}Job?job=${job.name}-job" method="post">
+                                <f:submit value="${jobBlocked ? 'Unblock' : 'Block'}"/>
+                            </f:form>
+                        </td>
+                    </tr>
+                </j:forEach>
+            </table>
+        </l:main-panel>
+    </l:layout>
+</j:jelly>

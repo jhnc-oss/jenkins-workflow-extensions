@@ -1,0 +1,8 @@
+target/
+bin/
+.idea/
+work/
+*.iml
+pom.xml.releaseBackup
+release.properties
+.attach_pid*
