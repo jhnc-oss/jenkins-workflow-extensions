@@ -41,7 +41,7 @@ public class JobBlockedProperty extends OptionalJobProperty<Job<?, ?>> {
         @NonNull
         @Override
         public String getDisplayName() {
-            return "Job blocked";
+            return Messages.JobBlockedProperty_displayName();
         }
     }
 }

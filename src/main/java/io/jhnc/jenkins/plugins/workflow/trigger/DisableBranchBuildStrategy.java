@@ -50,7 +50,7 @@ public class DisableBranchBuildStrategy extends BranchBuildStrategy {
         @NonNull
         @Override
         public String getDisplayName() {
-            return "Disabled";
+            return Messages.DisableBranchBuildStrategy_displayName();
         }
     }
 }

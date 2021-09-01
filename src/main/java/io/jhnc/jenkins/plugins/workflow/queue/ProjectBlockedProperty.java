@@ -42,7 +42,7 @@ public class ProjectBlockedProperty extends AbstractFolderProperty<WorkflowMulti
         @NonNull
         @Override
         public String getDisplayName() {
-            return "Project blocked";
+            return Messages.ProjectBlockedProperty_displayName();
         }
     }
 
