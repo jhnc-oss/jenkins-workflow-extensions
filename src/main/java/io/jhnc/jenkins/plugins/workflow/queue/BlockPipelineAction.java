@@ -26,7 +26,6 @@ package io.jhnc.jenkins.plugins.workflow.queue;
 
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.NonNull;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import hudson.model.Action;
 import hudson.model.Item;
 import hudson.model.Job;
@@ -48,7 +47,6 @@ public class BlockPipelineAction implements Action, StaplerProxy {
     private static final Permission PERMISSION = Item.CONFIGURE;
     private final MultiBranchProject<WorkflowJob, WorkflowRun> project;
 
-    @SuppressFBWarnings(value = "EI_EXPOSE_REP2", justification = "Required by Action API")
     public BlockPipelineAction(MultiBranchProject<WorkflowJob, WorkflowRun> project) {
         this.project = project;
     }
