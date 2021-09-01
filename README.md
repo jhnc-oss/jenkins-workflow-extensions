@@ -7,7 +7,14 @@
 
 Extensions for Jenkins Workflow Pipelines.
 
+## Multibranch build blocking
 
-## Permissions
+Multibranch Builds can be blocked on a project or job level. Triggered builds get queued until unblocked.
+
+### Permissions
 
 The `Item/Configure` permission is required to block jobs.
+
+## Disable branch build strategy
+
+Branch indexing remains enabled, but no builds are started on changes. This keeps the Mulitbranch projects updated without triggering builds automatically.
