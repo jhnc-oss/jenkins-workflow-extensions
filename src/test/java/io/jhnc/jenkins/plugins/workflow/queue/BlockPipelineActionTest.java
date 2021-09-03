@@ -99,8 +99,7 @@ class BlockPipelineActionTest {
 
     @Test
     void isBlockedReturnsProjectState() {
-        final DescribableList<AbstractFolderProperty<?>, AbstractFolderPropertyDescriptor> properties = folderProperty();
-        when(project.getProperties()).thenReturn(properties);
+        when(project.getProperties()).thenReturn(folderProperty());
         final BlockPipelineAction action = new BlockPipelineAction(project);
         assertThat(action.isBlocked()).isTrue();
     }
@@ -116,9 +115,8 @@ class BlockPipelineActionTest {
 
     @Test
     void blockDoesNothingIfNoJobAvailable() throws IOException {
-        final DescribableList<AbstractFolderProperty<?>, AbstractFolderPropertyDescriptor> properties = emptyFolderProperty();
         when(project.getAllJobs()).thenReturn(Collections.emptyList());
-        when(project.getProperties()).thenReturn(properties);
+        when(project.getProperties()).thenReturn(emptyFolderProperty());
         final BlockPipelineAction action = new BlockPipelineAction(project);
         final HttpResponse resp = action.doBlock(req);
         assertThat(resp).isNotNull();
@@ -127,9 +125,8 @@ class BlockPipelineActionTest {
     @Test
     void blockAddsProperty() throws IOException {
         final Job<?, ?> job = mock(Job.class);
-        final DescribableList<AbstractFolderProperty<?>, AbstractFolderPropertyDescriptor> properties = emptyFolderProperty();
         when(project.getAllJobs()).thenAnswer(x -> asList(job));
-        when(project.getProperties()).thenReturn(properties);
+        when(project.getProperties()).thenReturn(emptyFolderProperty());
         final BlockPipelineAction action = new BlockPipelineAction(project);
         final HttpResponse resp = action.doBlock(req);
         assertThat(resp).isNotNull();
@@ -141,10 +138,8 @@ class BlockPipelineActionTest {
     @Test
     void blockAddsPropertyOnlyOnce() throws IOException {
         final Job<?, ?> job = mock(Job.class);
-        final DescribableList<AbstractFolderProperty<?>, AbstractFolderPropertyDescriptor> empty = emptyFolderProperty();
-        final DescribableList<AbstractFolderProperty<?>, AbstractFolderPropertyDescriptor> properties = folderProperty();
         when(project.getAllJobs()).thenAnswer(x -> asList(job));
-        when(project.getProperties()).thenReturn(empty).thenReturn(properties);
+        when(project.getProperties()).thenReturn(emptyFolderProperty()).thenReturn(folderProperty());
         when(job.getProperty(JobBlockedProperty.class)).thenReturn(null, new JobBlockedProperty());
         final BlockPipelineAction action = new BlockPipelineAction(project);
         action.doBlock(req);
@@ -160,9 +155,8 @@ class BlockPipelineActionTest {
         final Job<?, ?> job0 = mock(Job.class);
         final Job<?, ?> job1 = mock(Job.class);
         final Job<?, ?> job2 = mock(Job.class);
-        final DescribableList<AbstractFolderProperty<?>, AbstractFolderPropertyDescriptor> properties = emptyFolderProperty();
         when(project.getAllJobs()).thenAnswer(x -> asList(job0, job1, job2));
-        when(project.getProperties()).thenReturn(properties);
+        when(project.getProperties()).thenReturn(emptyFolderProperty());
         final BlockPipelineAction action = new BlockPipelineAction(project);
         final HttpResponse resp = action.doBlock(req);
         assertThat(resp).isNotNull();

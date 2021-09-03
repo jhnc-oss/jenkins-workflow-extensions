@@ -50,7 +50,7 @@ class BlockPipelineQueueDispatcherTest {
     @Test
     void unrelatedJobTypeIsIgnored() {
         final BlockPipelineQueueDispatcher dispatcher = new BlockPipelineQueueDispatcher();
-        FreeStyleProject job = mock(FreeStyleProject.class);
+        final FreeStyleProject job = mock(FreeStyleProject.class);
         Queue.Item item = createItem(job);
 
         assertThat(dispatcher.canRun(item)).isNull();
@@ -59,8 +59,8 @@ class BlockPipelineQueueDispatcherTest {
     @Test
     void unblockedJobIsExecuted() {
         final BlockPipelineQueueDispatcher dispatcher = new BlockPipelineQueueDispatcher();
-        AbstractProject<?, ?> job = mock(AbstractProject.class);
-        Queue.Item item = createItem(job);
+        final AbstractProject<?, ?> job = mock(AbstractProject.class);
+        final Queue.Item item = createItem(job);
 
         assertThat(dispatcher.canRun(item)).isNull();
     }
@@ -86,7 +86,7 @@ class BlockPipelineQueueDispatcherTest {
         final AbstractProject<?, ?> job = mock(AbstractProject.class);
         when(job.getProperty(JobBlockedProperty.class)).thenReturn(new JobBlockedProperty());
         when(job.getParent()).thenAnswer(x -> project);
-        Queue.Item item = createItem(job);
+        final Queue.Item item = createItem(job);
         final CauseOfBlockage cause = dispatcher.canRun(item);
 
         assertThat(cause).isNotNull();
