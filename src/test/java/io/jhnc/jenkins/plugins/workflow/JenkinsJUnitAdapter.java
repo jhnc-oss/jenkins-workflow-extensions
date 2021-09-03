@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package io.jhnc.jenkins.plugins.workflow.queue;
+package io.jhnc.jenkins.plugins.workflow;
 
 import edu.umd.cs.findbugs.annotations.NonNull;
 import org.junit.jupiter.api.extension.AfterEachCallback;

@@ -26,6 +26,7 @@ package io.jhnc.jenkins.plugins.workflow.queue;
 
 import com.gargoylesoftware.htmlunit.FailingHttpStatusCodeException;
 import hudson.scm.NullSCM;
+import io.jhnc.jenkins.plugins.workflow.JenkinsJUnitAdapter;
 import jenkins.branch.Branch;
 import jenkins.branch.MultiBranchProject;
 import jenkins.scm.api.SCMHead;
