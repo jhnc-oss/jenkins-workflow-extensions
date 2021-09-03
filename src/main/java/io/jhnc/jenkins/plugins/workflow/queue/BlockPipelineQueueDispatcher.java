@@ -52,7 +52,7 @@ public class BlockPipelineQueueDispatcher extends QueueTaskDispatcher {
     public static class JobBlockedCause extends CauseOfBlockage {
         @Override
         public String getShortDescription() {
-            return "Job is blocked";
+            return Messages.BlockPipelineQueueDispatcher_shortDescription();
         }
     }
 
