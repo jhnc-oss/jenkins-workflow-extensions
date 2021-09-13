@@ -17,7 +17,7 @@
         <jenkins.version>2.289.1</jenkins.version>
         <java.level>8</java.level>
 
-        <junit.version>5.7.2</junit.version>
+        <junit.version>5.8.0</junit.version>
         <mockito.version>3.12.4</mockito.version>
     </properties>
 
