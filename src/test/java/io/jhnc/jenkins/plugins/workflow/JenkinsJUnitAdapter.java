@@ -37,10 +37,10 @@ import java.lang.reflect.Method;
 import java.util.Optional;
 
 public class JenkinsJUnitAdapter {
-    public static class JenkinsRule extends org.jvnet.hudson.test.JenkinsRule {
+    public static class JUnitJenkinsRule extends org.jvnet.hudson.test.JenkinsRule {
         private final ParameterContext context;
 
-        JenkinsRule(@NonNull ParameterContext context, @NonNull ExtensionContext extensionContext) {
+        JUnitJenkinsRule(@NonNull ParameterContext context, @NonNull ExtensionContext extensionContext) {
             this.context = context;
             this.testDescription = Description.createTestDescription(
                     extensionContext.getTestClass().map(Class::getName).orElse(null),
@@ -69,14 +69,15 @@ public class JenkinsJUnitAdapter {
         @Override
         public boolean supportsParameter(ParameterContext parameterContext, ExtensionContext extensionContext)
                 throws ParameterResolutionException {
-            return parameterContext.getParameter().getType().equals(JenkinsRule.class);
+            return parameterContext.getParameter().getType().equals(JUnitJenkinsRule.class);
         }
 
         @Override
         public Object resolveParameter(ParameterContext parameterContext, ExtensionContext extensionContext)
                 throws ParameterResolutionException {
-            final JenkinsRule instance = extensionContext.getStore(ns).getOrComputeIfAbsent(
-                    key, key -> new JenkinsRule(parameterContext, extensionContext), JenkinsRule.class);
+            final JUnitJenkinsRule instance = extensionContext.getStore(ns)
+                    .getOrComputeIfAbsent(key, key
+                            -> new JUnitJenkinsRule(parameterContext, extensionContext), JUnitJenkinsRule.class);
             try {
                 instance.before();
                 return instance;
@@ -87,7 +88,7 @@ public class JenkinsJUnitAdapter {
 
         @Override
         public void afterEach(ExtensionContext extensionContext) throws Exception {
-            final JenkinsRule rule = extensionContext.getStore(ns).remove(key, JenkinsRule.class);
+            final JUnitJenkinsRule rule = extensionContext.getStore(ns).remove(key, JUnitJenkinsRule.class);
 
             if (rule != null) {
                 rule.after();
