@@ -24,6 +24,7 @@
 
 package io.jhnc.jenkins.plugins.workflow.trigger;
 
+import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.Extension;
 import hudson.model.TaskListener;
@@ -41,7 +42,8 @@ public class DisableBranchBuildStrategy extends BranchBuildStrategy {
 
     @Override
     public boolean isAutomaticBuild(@NonNull SCMSource source, @NonNull SCMHead head, @NonNull SCMRevision currRevision,
-                                    SCMRevision lastBuiltRevision, SCMRevision lastSeenRevision, @NonNull TaskListener listener) {
+                                    @CheckForNull SCMRevision lastBuiltRevision, @CheckForNull SCMRevision lastSeenRevision,
+                                    @NonNull TaskListener listener) {
         return false;
     }
 

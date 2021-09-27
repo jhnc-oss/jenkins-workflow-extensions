@@ -48,14 +48,6 @@ public class BlockPipelineQueueDispatcher extends QueueTaskDispatcher {
         return super.canRun(item);
     }
 
-
-    public static class JobBlockedCause extends CauseOfBlockage {
-        @Override
-        public String getShortDescription() {
-            return Messages.BlockPipelineQueueDispatcher_shortDescription();
-        }
-    }
-
     private boolean isBlocked(@NonNull Job<?, ?> job) {
         if (job.getParent() instanceof WorkflowMultiBranchProject) {
             final WorkflowMultiBranchProject parent = (WorkflowMultiBranchProject) job.getParent();
@@ -65,5 +57,13 @@ public class BlockPipelineQueueDispatcher extends QueueTaskDispatcher {
             }
         }
         return job.getProperty(JobBlockedProperty.class) != null;
+    }
+
+
+    public static class JobBlockedCause extends CauseOfBlockage {
+        @Override
+        public String getShortDescription() {
+            return Messages.BlockPipelineQueueDispatcher_shortDescription();
+        }
     }
 }
