@@ -16,7 +16,7 @@ jobs:
         uses: actions/setup-java@main
         with:
           java-version: ${{ matrix.java }}
-          distribution: 'adopt'
+          distribution: 'temurin'
           cache: 'maven'
       - name: Build
         run: |
