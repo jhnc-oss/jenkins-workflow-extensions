@@ -10,15 +10,8 @@ jobs:
         java: [ 8, 11 ]
     name: jdk-${{ matrix.java }}
     steps:
-      - name: Checkout
-        uses: actions/checkout@main
-      - name: Setup jdk-${{ matrix.java }}
-        uses: actions/setup-java@main
+      - name: Build
+        uses: offa/maven-action@main
         with:
           java-version: ${{ matrix.java }}
-          distribution: 'temurin'
-          cache: 'maven'
-      - name: Build
-        run: |
-          mvn verify -B -V -ntp -Dmaven.javadoc.skip=true
-          mvn pmd:pmd -B -ntp
+          pmd: true
