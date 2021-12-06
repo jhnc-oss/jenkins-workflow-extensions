@@ -40,6 +40,7 @@ import org.kohsuke.stapler.StaplerProxy;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.interceptor.RequirePOST;
 
+import javax.servlet.ServletException;
 import java.io.IOException;
 import java.util.Collection;
 
@@ -89,6 +90,11 @@ public class BlockPipelineAction implements Action, StaplerProxy {
         return job.getProperty(JobBlockedProperty.class) != null;
     }
 
+    @CheckForNull
+    public String getMessage() {
+        return isBlocked() ? project.getProperties().get(ProjectBlockedProperty.class).getMessage() : null;
+    }
+
     @RequirePOST
     public HttpResponse doBlockJob(@NonNull StaplerRequest req) throws IOException {
         final String jobName = req.getParameter("job");
@@ -116,8 +122,8 @@ public class BlockPipelineAction implements Action, StaplerProxy {
     }
 
     @RequirePOST
-    public HttpResponse doBlock(@NonNull StaplerRequest req) throws IOException {
-        addBlockProperty();
+    public HttpResponse doBlock(@NonNull StaplerRequest req) throws IOException, ServletException {
+        addBlockProperty(req.getSubmittedForm().getString("message").trim());
         return FormApply.success(".");
     }
 
@@ -127,10 +133,8 @@ public class BlockPipelineAction implements Action, StaplerProxy {
         return FormApply.success(".");
     }
 
-    protected void addBlockProperty() throws IOException {
-        if (!isBlocked()) {
-            project.addProperty(new ProjectBlockedProperty());
-        }
+    protected void addBlockProperty(@NonNull String message) throws IOException {
+        project.getProperties().replace(new ProjectBlockedProperty(message));
 
         for (final Job<?, ?> job : project.getAllJobs()) {
             addBlockPropertyToJob(job);

@@ -35,6 +35,7 @@ import org.jenkinsci.plugins.workflow.multibranch.WorkflowMultiBranchProject;
 
 @Extension
 public class BlockPipelineQueueDispatcher extends QueueTaskDispatcher {
+
     @CheckForNull
     @Override
     public CauseOfBlockage canRun(Queue.Item item) {
@@ -42,28 +43,39 @@ public class BlockPipelineQueueDispatcher extends QueueTaskDispatcher {
             final Job<?, ?> job = (Job<?, ?>) item.task;
 
             if (isBlocked(job)) {
-                return new JobBlockedCause();
+                final ProjectBlockedProperty property = getProjectProperty(job);
+                return new JobBlockedCause(property == null ? null : property.getMessage());
             }
         }
         return super.canRun(item);
     }
 
     private boolean isBlocked(@NonNull Job<?, ?> job) {
-        if (job.getParent() instanceof WorkflowMultiBranchProject) {
-            final WorkflowMultiBranchProject parent = (WorkflowMultiBranchProject) job.getParent();
-
-            if (parent.getProperties().get(ProjectBlockedProperty.class) != null) {
-                return true;
-            }
+        if (getProjectProperty(job) != null) {
+            return true;
         }
         return job.getProperty(JobBlockedProperty.class) != null;
     }
 
+    @CheckForNull
+    private ProjectBlockedProperty getProjectProperty(@NonNull Job<?, ?> job) {
+        if (job.getParent() instanceof WorkflowMultiBranchProject) {
+            return ((WorkflowMultiBranchProject) job.getParent()).getProperties().get(ProjectBlockedProperty.class);
+        }
+        return null;
+    }
+
 
     public static class JobBlockedCause extends CauseOfBlockage {
+        private final String message;
+
+        public JobBlockedCause(@CheckForNull String message) {
+            this.message = message;
+        }
+
         @Override
         public String getShortDescription() {
-            return Messages.BlockPipelineQueueDispatcher_shortDescription();
+            return Messages.BlockPipelineQueueDispatcher_shortDescription() + (message == null ? "" : ": " + message);
         }
     }
 }

@@ -32,6 +32,9 @@ import hudson.util.DescribableList;
 import org.jenkinsci.plugins.workflow.job.WorkflowJob;
 import org.jenkinsci.plugins.workflow.multibranch.WorkflowMultiBranchProject;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Collections;
 
@@ -39,7 +42,13 @@ import static com.google.common.truth.Truth.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+@ExtendWith(MockitoExtension.class)
 class BlockPipelineQueueDispatcherTest {
+
+    @Mock
+    WorkflowMultiBranchProject project;
+
+
     @Test
     void unrelatedItemsAreIgnored() {
         final BlockPipelineQueueDispatcher dispatcher = new BlockPipelineQueueDispatcher();
@@ -51,27 +60,26 @@ class BlockPipelineQueueDispatcherTest {
     void unrelatedJobTypeIsIgnored() {
         final BlockPipelineQueueDispatcher dispatcher = new BlockPipelineQueueDispatcher();
         final FreeStyleProject job = mock(FreeStyleProject.class);
-        Queue.Item item = createItem(job);
 
-        assertThat(dispatcher.canRun(item)).isNull();
+        assertThat(dispatcher.canRun(createItem(job))).isNull();
     }
 
     @Test
     void unblockedJobIsExecuted() {
         final BlockPipelineQueueDispatcher dispatcher = new BlockPipelineQueueDispatcher();
         final AbstractProject<?, ?> job = mock(AbstractProject.class);
-        final Queue.Item item = createItem(job);
 
-        assertThat(dispatcher.canRun(item)).isNull();
+        assertThat(dispatcher.canRun(createItem(job))).isNull();
     }
 
     @Test
     void blockedJobIsNotExecuted() {
         final BlockPipelineQueueDispatcher dispatcher = new BlockPipelineQueueDispatcher();
+        when(project.getProperties()).thenReturn(new DescribableList<>(project, Collections.emptyList()));
         final AbstractProject<?, ?> job = mock(AbstractProject.class);
+        when(job.getParent()).thenAnswer(x -> project);
         when(job.getProperty(JobBlockedProperty.class)).thenReturn(new JobBlockedProperty());
-        Queue.Item item = createItem(job);
-        final CauseOfBlockage cause = dispatcher.canRun(item);
+        final CauseOfBlockage cause = dispatcher.canRun(createItem(job));
 
         assertThat(cause).isNotNull();
         assertThat(cause).isInstanceOf(BlockPipelineQueueDispatcher.JobBlockedCause.class);
@@ -81,13 +89,11 @@ class BlockPipelineQueueDispatcherTest {
     @Test
     void blockedJobIsNotExecutedIfParentIsUnblocked() {
         final BlockPipelineQueueDispatcher dispatcher = new BlockPipelineQueueDispatcher();
-        final WorkflowMultiBranchProject project = mock(WorkflowMultiBranchProject.class);
         when(project.getProperties()).thenReturn(new DescribableList<>(project, Collections.emptyList()));
         final AbstractProject<?, ?> job = mock(AbstractProject.class);
         when(job.getProperty(JobBlockedProperty.class)).thenReturn(new JobBlockedProperty());
         when(job.getParent()).thenAnswer(x -> project);
-        final Queue.Item item = createItem(job);
-        final CauseOfBlockage cause = dispatcher.canRun(item);
+        final CauseOfBlockage cause = dispatcher.canRun(createItem(job));
 
         assertThat(cause).isNotNull();
         assertThat(cause).isInstanceOf(BlockPipelineQueueDispatcher.JobBlockedCause.class);
@@ -97,11 +103,9 @@ class BlockPipelineQueueDispatcherTest {
     @Test
     void unblockedProjectIsExecuted() {
         final BlockPipelineQueueDispatcher dispatcher = new BlockPipelineQueueDispatcher();
-        final WorkflowMultiBranchProject project = mock(WorkflowMultiBranchProject.class);
         when(project.getProperties()).thenReturn(new DescribableList<>(project, Collections.emptyList()));
         final WorkflowJob job = new WorkflowJob(project, "x");
-        Queue.Item item = createItem(job);
-        final CauseOfBlockage cause = dispatcher.canRun(item);
+        final CauseOfBlockage cause = dispatcher.canRun(createItem(job));
 
         assertThat(cause).isNull();
     }
@@ -109,15 +113,26 @@ class BlockPipelineQueueDispatcherTest {
     @Test
     void blockedProjectIsNotExecuted() {
         final BlockPipelineQueueDispatcher dispatcher = new BlockPipelineQueueDispatcher();
-        final WorkflowMultiBranchProject project = mock(WorkflowMultiBranchProject.class);
-        when(project.getProperties()).thenReturn(new DescribableList<>(project, Collections.singleton(new ProjectBlockedProperty())));
+        when(project.getProperties()).thenReturn(new DescribableList<>(project, Collections.singleton(new ProjectBlockedProperty(""))));
         final WorkflowJob job = new WorkflowJob(project, "x");
-        Queue.Item item = createItem(job);
-        final CauseOfBlockage cause = dispatcher.canRun(item);
+        final CauseOfBlockage cause = dispatcher.canRun(createItem(job));
 
         assertThat(cause).isNotNull();
         assertThat(cause).isInstanceOf(BlockPipelineQueueDispatcher.JobBlockedCause.class);
         assertThat(cause.getShortDescription()).isNotEmpty();
+    }
+
+    @Test
+    void blockedProjectWithCustomMessage() {
+        final BlockPipelineQueueDispatcher dispatcher = new BlockPipelineQueueDispatcher();
+        final ProjectBlockedProperty property = new ProjectBlockedProperty("a custom message");
+        when(project.getProperties()).thenReturn(new DescribableList<>(project, Collections.singleton(property)));
+        final WorkflowJob job = new WorkflowJob(project, "x");
+        final CauseOfBlockage cause = dispatcher.canRun(createItem(job));
+
+        assertThat(cause).isNotNull();
+        assertThat(cause).isInstanceOf(BlockPipelineQueueDispatcher.JobBlockedCause.class);
+        assertThat(cause.getShortDescription()).contains("a custom message");
     }
 
     private Queue.Item createItem(Queue.Task task) {
