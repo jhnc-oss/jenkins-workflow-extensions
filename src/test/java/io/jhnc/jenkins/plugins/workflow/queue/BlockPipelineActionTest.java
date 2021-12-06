@@ -26,11 +26,13 @@ package io.jhnc.jenkins.plugins.workflow.queue;
 
 import com.cloudbees.hudson.plugins.folder.AbstractFolderProperty;
 import com.cloudbees.hudson.plugins.folder.AbstractFolderPropertyDescriptor;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.model.Item;
 import hudson.model.Job;
 import hudson.security.Permission;
 import hudson.util.DescribableList;
 import jenkins.branch.MultiBranchProject;
+import net.sf.json.JSONObject;
 import org.jenkinsci.plugins.workflow.job.WorkflowJob;
 import org.jenkinsci.plugins.workflow.job.WorkflowRun;
 import org.junit.jupiter.api.Test;
@@ -42,6 +44,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.access.AccessDeniedException;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -50,6 +53,7 @@ import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
@@ -63,9 +67,11 @@ class BlockPipelineActionTest {
     @Mock
     StaplerRequest req;
 
+
     @Test
     void visibleIfPermissionGranted() {
         when(project.hasPermission(Item.CONFIGURE)).thenReturn(true);
+
         final BlockPipelineAction action = new BlockPipelineAction(project);
         assertThat(action.getIconFileName()).isNotNull();
     }
@@ -73,6 +79,7 @@ class BlockPipelineActionTest {
     @Test
     void notVisibleIfPermissionDenied() {
         when(project.hasPermission(Item.CONFIGURE)).thenReturn(false);
+
         final BlockPipelineAction action = new BlockPipelineAction(project);
         assertThat(action.getIconFileName()).isNull();
     }
@@ -80,12 +87,14 @@ class BlockPipelineActionTest {
     @Test
     void hasStablePath() {
         final BlockPipelineAction action = new BlockPipelineAction(project);
+
         assertThat(action.getUrlName()).isEqualTo("block");
     }
 
     @Test
     void checksPermission() {
         final BlockPipelineAction action = new BlockPipelineAction(project);
+
         assertThat(action.getTarget()).isNotNull();
         verify(project).checkPermission(Item.CONFIGURE);
     }
@@ -93,13 +102,15 @@ class BlockPipelineActionTest {
     @Test
     void throwsOnAccessDenied() {
         doThrow(new AccessDeniedException("expected")).when(project).checkPermission(any(Permission.class));
+
         final BlockPipelineAction action = new BlockPipelineAction(project);
         assertThrows(AccessDeniedException.class, action::getTarget);
     }
 
     @Test
     void isBlockedReturnsProjectState() {
-        when(project.getProperties()).thenReturn(folderProperty());
+        when(project.getProperties()).thenReturn(projectProperties());
+
         final BlockPipelineAction action = new BlockPipelineAction(project);
         assertThat(action.isBlocked()).isTrue();
     }
@@ -109,69 +120,101 @@ class BlockPipelineActionTest {
         final Job<?, ?> job0 = mock(Job.class);
         final Job<?, ?> job1 = mock(Job.class);
         when(project.getAllJobs()).thenAnswer(x -> asList(job0, job1));
+
         final BlockPipelineAction action = new BlockPipelineAction(project);
         assertThat(action.getJobs()).containsExactly(job0, job1);
     }
 
     @Test
-    void blockDoesNothingIfNoJobAvailable() throws IOException {
+    void blockDoesNothingIfNoJobAvailable() throws Exception {
         when(project.getAllJobs()).thenReturn(Collections.emptyList());
-        when(project.getProperties()).thenReturn(emptyFolderProperty());
+        when(project.getProperties()).thenReturn(emptyProjectProperties());
+
         final BlockPipelineAction action = new BlockPipelineAction(project);
+        doReturn(formData("")).when(req).getSubmittedForm();
+
         final HttpResponse resp = action.doBlock(req);
         assertThat(resp).isNotNull();
     }
 
     @Test
-    void blockAddsProperty() throws IOException {
+    void blockAddsProperty() throws Exception {
         final Job<?, ?> job = mock(Job.class);
         when(project.getAllJobs()).thenAnswer(x -> asList(job));
-        when(project.getProperties()).thenReturn(emptyFolderProperty());
+        final DescribableList<AbstractFolderProperty<?>, AbstractFolderPropertyDescriptor> properties = emptyProjectProperties();
+        doReturn(properties).when(project).getProperties();
+        doReturn(formData("")).when(req).getSubmittedForm();
+
         final BlockPipelineAction action = new BlockPipelineAction(project);
         final HttpResponse resp = action.doBlock(req);
-        assertThat(resp).isNotNull();
 
+        assertThat(resp).isNotNull();
         verify(job).addProperty(any(JobBlockedProperty.class));
-        verify(project).addProperty(any(ProjectBlockedProperty.class));
+        assertThat(properties).hasSize(1);
     }
 
     @Test
-    void blockAddsPropertyOnlyOnce() throws IOException {
+    void blockAddsPropertyWithMessage() throws Exception {
         final Job<?, ?> job = mock(Job.class);
         when(project.getAllJobs()).thenAnswer(x -> asList(job));
-        when(project.getProperties()).thenReturn(emptyFolderProperty()).thenReturn(folderProperty());
+        final DescribableList<AbstractFolderProperty<?>, AbstractFolderPropertyDescriptor> properties = emptyProjectProperties();
+        doReturn(properties).when(project).getProperties();
+        doReturn(formData("abc def")).when(req).getSubmittedForm();
+
+        final BlockPipelineAction action = new BlockPipelineAction(project);
+        final HttpResponse resp = action.doBlock(req);
+
+        assertThat(resp).isNotNull();
+        verify(job).addProperty(any(JobBlockedProperty.class));
+        assertThat(properties).hasSize(1);
+        assertThat(properties.get(0)).isInstanceOf(ProjectBlockedProperty.class);
+        assertThat(((ProjectBlockedProperty) properties.get(0)).getMessage()).contains("abc def");
+    }
+
+    @Test
+    void blockAddsPropertyOnlyOnce() throws Exception {
+        final Job<?, ?> job = mock(Job.class);
+        when(project.getAllJobs()).thenAnswer(x -> asList(job));
+        final DescribableList<AbstractFolderProperty<?>, AbstractFolderPropertyDescriptor> properties = emptyProjectProperties();
+        doReturn(properties).when(project).getProperties();
         when(job.getProperty(JobBlockedProperty.class)).thenReturn(null, new JobBlockedProperty());
+        doReturn(formData("")).when(req).getSubmittedForm();
+
         final BlockPipelineAction action = new BlockPipelineAction(project);
         action.doBlock(req);
         action.doBlock(req);
         action.doBlock(req);
 
         verify(job).addProperty(any(JobBlockedProperty.class));
-        verify(project).addProperty(any(ProjectBlockedProperty.class));
+        assertThat(properties).hasSize(1);
     }
 
     @Test
-    void blockAddsPropertyToMultipleJobs() throws IOException {
+    void blockAddsPropertyToMultipleJobs() throws Exception {
         final Job<?, ?> job0 = mock(Job.class);
         final Job<?, ?> job1 = mock(Job.class);
         final Job<?, ?> job2 = mock(Job.class);
         when(project.getAllJobs()).thenAnswer(x -> asList(job0, job1, job2));
-        when(project.getProperties()).thenReturn(emptyFolderProperty());
+        final DescribableList<AbstractFolderProperty<?>, AbstractFolderPropertyDescriptor> properties = emptyProjectProperties();
+        doReturn(properties).when(project).getProperties();
+        doReturn(formData("")).when(req).getSubmittedForm();
+
         final BlockPipelineAction action = new BlockPipelineAction(project);
         final HttpResponse resp = action.doBlock(req);
-        assertThat(resp).isNotNull();
 
+        assertThat(resp).isNotNull();
         verify(job0).addProperty(any(JobBlockedProperty.class));
         verify(job1).addProperty(any(JobBlockedProperty.class));
         verify(job2).addProperty(any(JobBlockedProperty.class));
-        verify(project).addProperty(any(ProjectBlockedProperty.class));
+        assertThat(properties).hasSize(1);
     }
 
     @Test
     void unblockDoesNothingIfNotBlocked() throws IOException {
-        final DescribableList<AbstractFolderProperty<?>, AbstractFolderPropertyDescriptor> properties = emptyFolderProperty();
+        final DescribableList<AbstractFolderProperty<?>, AbstractFolderPropertyDescriptor> properties = emptyProjectProperties();
         when(project.getAllJobs()).thenReturn(Collections.emptyList());
         when(project.getProperties()).thenReturn(properties);
+
         final BlockPipelineAction action = new BlockPipelineAction(project);
         final HttpResponse resp = action.doUnblock(req);
 
@@ -181,9 +224,10 @@ class BlockPipelineActionTest {
 
     @Test
     void unblockRemovesPropertyFromProjectIfNoJobAvailable() throws IOException {
-        final DescribableList<AbstractFolderProperty<?>, AbstractFolderPropertyDescriptor> properties = folderProperty();
+        final DescribableList<AbstractFolderProperty<?>, AbstractFolderPropertyDescriptor> properties = projectProperties();
         when(project.getAllJobs()).thenReturn(Collections.emptyList());
         when(project.getProperties()).thenReturn(properties);
+
         final BlockPipelineAction action = new BlockPipelineAction(project);
         final HttpResponse resp = action.doUnblock(req);
 
@@ -194,9 +238,10 @@ class BlockPipelineActionTest {
     @Test
     void unblockRemovesProperty() throws IOException {
         final Job<?, ?> job = mock(Job.class);
-        final DescribableList<AbstractFolderProperty<?>, AbstractFolderPropertyDescriptor> properties = folderProperty();
+        final DescribableList<AbstractFolderProperty<?>, AbstractFolderPropertyDescriptor> properties = projectProperties();
         when(project.getAllJobs()).thenAnswer(x -> asList(job));
         when(project.getProperties()).thenReturn(properties);
+
         final BlockPipelineAction action = new BlockPipelineAction(project);
         final HttpResponse resp = action.doUnblock(req);
 
@@ -210,13 +255,14 @@ class BlockPipelineActionTest {
         final Job<?, ?> job0 = mock(Job.class);
         final Job<?, ?> job1 = mock(Job.class);
         final Job<?, ?> job2 = mock(Job.class);
-        final DescribableList<AbstractFolderProperty<?>, AbstractFolderPropertyDescriptor> properties = folderProperty();
+        final DescribableList<AbstractFolderProperty<?>, AbstractFolderPropertyDescriptor> properties = projectProperties();
         when(project.getAllJobs()).thenAnswer(x -> asList(job0, job1, job2));
         when(project.getProperties()).thenReturn(properties);
+
         final BlockPipelineAction action = new BlockPipelineAction(project);
         final HttpResponse resp = action.doUnblock(req);
-        assertThat(resp).isNotNull();
 
+        assertThat(resp).isNotNull();
         verify(job0).removeProperty(JobBlockedProperty.class);
         verify(job1).removeProperty(JobBlockedProperty.class);
         verify(job2).removeProperty(JobBlockedProperty.class);
@@ -228,6 +274,7 @@ class BlockPipelineActionTest {
         final Job<?, ?> blocked = mock(Job.class);
         final Job<?, ?> unblocked = mock(Job.class);
         when(blocked.getProperty(JobBlockedProperty.class)).thenReturn(new JobBlockedProperty());
+
         final BlockPipelineAction action = new BlockPipelineAction(project);
 
         assertThat(action.isBlocked(blocked)).isTrue();
@@ -239,6 +286,7 @@ class BlockPipelineActionTest {
         final WorkflowJob job = new WorkflowJob(project, "test-0");
         when(req.getParameter("job")).thenReturn("test-0");
         when(project.getJob("test-0")).thenReturn(job);
+
         final BlockPipelineAction actionSpy = spy(new BlockPipelineAction(project));
         doNothing().when(actionSpy).addBlockPropertyToJob(any());
 
@@ -293,14 +341,16 @@ class BlockPipelineActionTest {
         assertThat(resp).isNotNull();
     }
 
-
-    private DescribableList<AbstractFolderProperty<?>, AbstractFolderPropertyDescriptor> folderProperty() {
-        return new DescribableList<>(project, Collections.singleton(new ProjectBlockedProperty()));
+    private DescribableList<AbstractFolderProperty<?>, AbstractFolderPropertyDescriptor> projectProperties() {
+        return new DescribableList<>(project, Collections.singleton(new ProjectBlockedProperty("")));
     }
 
-    private DescribableList<AbstractFolderProperty<?>, AbstractFolderPropertyDescriptor> emptyFolderProperty() {
-        return new DescribableList<>(project, Collections.emptyList());
+    private DescribableList<AbstractFolderProperty<?>, AbstractFolderPropertyDescriptor> emptyProjectProperties() {
+        return new DescribableList<>(project, new ArrayList<>());
+    }
 
+    private JSONObject formData(@NonNull String message) {
+        return new JSONObject().element("message", message);
     }
 
     @SafeVarargs

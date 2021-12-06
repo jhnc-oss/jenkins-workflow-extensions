@@ -28,12 +28,23 @@ SOFTWARE.
         <l:main-panel>
             <f:section title="Pipeline"/>
 
-            <j:set var="projectStateAction" value="${it.blocked ? 'unblock' : 'block'}"/>
-            <f:form action="${projectStateAction}" name="${projectStateAction}" method="post">
-                <f:submit value="${it.blocked ? 'Unblock' : 'Block'}"/>
+            <f:form action="block" name="block" method="post">
+                <f:entry title="${%message.title}" field="message">
+                    <f:textbox value="${it.message}"/>
+                </f:entry>
+
+                <f:submit value='${it.blocked ? "%project.update" : "%project.block"}'/>
             </f:form>
 
-            <p><i><b>Note:</b>This will override the job specific settings.</i></p>
+            <j:if test="${it.blocked}">
+                <f:form action="unblock" method="post" name="unblock">
+                    <f:bottomButtonBar>
+                        <f:submit value="${%project.unblock}"/>
+                    </f:bottomButtonBar>
+                </f:form>
+            </j:if>
+
+            <p><i><b>${%note.headline}:</b> ${%note.text}</i></p>
 
 
             <f:section title="Pipeline Jobs"/>
@@ -41,22 +52,25 @@ SOFTWARE.
             <table class="pane" style="width: auto;">
                 <tr>
                     <th class="pane-header">#</th>
-                    <th class="pane-header">Job</th>
-                    <th class="pane-header">Blocked</th>
+                    <th class="pane-header">${%job.headline.job}</th>
+                    <th class="pane-header">${%job.headline.blocked}</th>
                     <th class="pane-header"/>
                 </tr>
                 <j:forEach var="job" items="${it.jobs}" indexVar="i">
-                    <j:set var="jobBlocked" value="${it.isBlocked(job)}" />
+                    <j:set var="jobBlocked" value="${it.isBlocked(job)}"/>
                     <tr>
                         <td>${i}</td>
-                        <td><b>${job.displayName}</b></td>
+                        <td>
+                            <b>${job.displayName}</b>
+                        </td>
                         <td>
                             <f:checkbox checked="${jobBlocked}" readonly="true"/>
                         </td>
                         <td>
                             <j:set var="jobStateAction" value="${jobBlocked ? 'unblock' : 'block'}"/>
-                            <f:form action="${jobStateAction}Job?job=${job.name}" name="${jobStateAction}Job?job=${job.name}-job" method="post">
-                                <f:submit value="${jobBlocked ? 'Unblock' : 'Block'}"/>
+                            <f:form action="${jobStateAction}Job?job=${job.name}"
+                                    name="${jobStateAction}Job?job=${job.name}-job" method="post">
+                                <f:submit value='${jobBlocked ? "%job.unblock" : "%job.block"}'/>
                             </f:form>
                         </td>
                     </tr>

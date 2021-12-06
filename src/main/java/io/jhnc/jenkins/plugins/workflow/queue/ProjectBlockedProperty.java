@@ -29,11 +29,17 @@ import com.cloudbees.hudson.plugins.folder.AbstractFolderPropertyDescriptor;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.Extension;
 import org.jenkinsci.plugins.workflow.multibranch.WorkflowMultiBranchProject;
-import org.kohsuke.stapler.DataBoundConstructor;
 
 public class ProjectBlockedProperty extends AbstractFolderProperty<WorkflowMultiBranchProject> {
-    @DataBoundConstructor
-    public ProjectBlockedProperty() {
+    private final String message;
+
+    public ProjectBlockedProperty(@NonNull String message) {
+        this.message = message;
+    }
+
+    @NonNull
+    public String getMessage() {
+        return message;
     }
 
 
