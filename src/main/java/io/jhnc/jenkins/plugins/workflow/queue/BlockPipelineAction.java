@@ -43,6 +43,7 @@ import org.kohsuke.stapler.interceptor.RequirePOST;
 import javax.servlet.ServletException;
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Date;
 
 public class BlockPipelineAction implements Action, StaplerProxy {
     private static final Permission PERMISSION = Item.CONFIGURE;
@@ -93,6 +94,11 @@ public class BlockPipelineAction implements Action, StaplerProxy {
     @CheckForNull
     public String getMessage() {
         return isBlocked() ? project.getProperties().get(ProjectBlockedProperty.class).getMessage() : null;
+    }
+
+    @CheckForNull
+    public Date getTimestamp() {
+        return isBlocked() ? project.getProperties().get(ProjectBlockedProperty.class).getTimestamp() : null;
     }
 
     @RequirePOST

@@ -47,6 +47,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
 import static com.google.common.truth.Truth.assertThat;
@@ -155,8 +156,6 @@ class BlockPipelineActionTest {
 
     @Test
     void blockAddsPropertyWithMessage() throws Exception {
-        final Job<?, ?> job = mock(Job.class);
-        when(project.getAllJobs()).thenAnswer(x -> asList(job));
         final DescribableList<AbstractFolderProperty<?>, AbstractFolderPropertyDescriptor> properties = emptyProjectProperties();
         doReturn(properties).when(project).getProperties();
         doReturn(formData("abc def")).when(req).getSubmittedForm();
@@ -165,10 +164,25 @@ class BlockPipelineActionTest {
         final HttpResponse resp = action.doBlock(req);
 
         assertThat(resp).isNotNull();
-        verify(job).addProperty(any(JobBlockedProperty.class));
         assertThat(properties).hasSize(1);
         assertThat(properties.get(0)).isInstanceOf(ProjectBlockedProperty.class);
         assertThat(((ProjectBlockedProperty) properties.get(0)).getMessage()).contains("abc def");
+    }
+
+    @Test
+    void blockAddsPropertyWithTimestamp() throws Exception {
+        final Date timestampRef = new Date();
+        final DescribableList<AbstractFolderProperty<?>, AbstractFolderPropertyDescriptor> properties = emptyProjectProperties();
+        doReturn(properties).when(project).getProperties();
+        doReturn(formData("")).when(req).getSubmittedForm();
+
+        final BlockPipelineAction action = new BlockPipelineAction(project);
+        final HttpResponse resp = action.doBlock(req);
+
+        assertThat(resp).isNotNull();
+        assertThat(properties).hasSize(1);
+        assertThat(properties.get(0)).isInstanceOf(ProjectBlockedProperty.class);
+        assertThat(((ProjectBlockedProperty) properties.get(0)).getTimestamp()).isAtLeast(timestampRef);
     }
 
     @Test

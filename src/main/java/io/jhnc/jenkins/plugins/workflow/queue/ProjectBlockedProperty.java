@@ -30,11 +30,15 @@ import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.Extension;
 import org.jenkinsci.plugins.workflow.multibranch.WorkflowMultiBranchProject;
 
+import java.util.Date;
+
 public class ProjectBlockedProperty extends AbstractFolderProperty<WorkflowMultiBranchProject> {
     private final String message;
+    private final Date timestamp;
 
     public ProjectBlockedProperty(@NonNull String message) {
         this.message = message;
+        this.timestamp = new Date();
     }
 
     @NonNull
@@ -42,6 +46,10 @@ public class ProjectBlockedProperty extends AbstractFolderProperty<WorkflowMulti
         return message;
     }
 
+    @NonNull
+    public Date getTimestamp() {
+        return new Date(timestamp.getTime());
+    }
 
     @Extension
     public static class DescriptorImpl extends AbstractFolderPropertyDescriptor {
