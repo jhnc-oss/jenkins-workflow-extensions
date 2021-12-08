@@ -28,8 +28,8 @@ SOFTWARE.
         <l:main-panel>
             <f:section title="Pipeline"/>
 
-            <j:if test="${it.timestamp != null}">
-                ${%project.info.timestamp} <b><i:formatDate value="${it.timestamp}" type="both" dateStyle="medium" timeStyle="short" /></b>
+            <j:if test="${it.blocked}">
+                ${%project.info.timestamp} <b><i:formatDate value="${it.timestamp}" type="both" dateStyle="medium" timeStyle="short" /></b> ${%project.info.user} <b>${it.userName}</b>
             </j:if>
 
             <f:form action="block" name="block" method="post">

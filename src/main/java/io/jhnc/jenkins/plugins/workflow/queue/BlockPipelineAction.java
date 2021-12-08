@@ -29,6 +29,7 @@ import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.model.Action;
 import hudson.model.Item;
 import hudson.model.Job;
+import hudson.model.User;
 import hudson.security.Permission;
 import hudson.util.FormApply;
 import hudson.util.FormValidation;
@@ -103,6 +104,12 @@ public class BlockPipelineAction implements Action, StaplerProxy {
         return property != null ? property.getTimestamp() : null;
     }
 
+    @CheckForNull
+    public String getUserName() {
+        final ProjectBlockedProperty property = getProjectProperty();
+        return property != null ? property.getUser() : null;
+    }
+
     @RequirePOST
     public HttpResponse doBlockJob(@NonNull StaplerRequest req) throws IOException {
         final String jobName = req.getParameter("job");
@@ -142,7 +149,7 @@ public class BlockPipelineAction implements Action, StaplerProxy {
     }
 
     protected void addBlockProperty(@NonNull String message) throws IOException {
-        project.getProperties().replace(new ProjectBlockedProperty(message));
+        project.getProperties().replace(new ProjectBlockedProperty(message, getCurrentUser().getFullName()));
 
         for (final Job<?, ?> job : project.getAllJobs()) {
             addBlockPropertyToJob(job);
@@ -165,6 +172,12 @@ public class BlockPipelineAction implements Action, StaplerProxy {
 
     protected void removeBlockPropertyFromJob(@NonNull Job<?, ?> job) throws IOException {
         job.removeProperty(JobBlockedProperty.class);
+    }
+
+    @NonNull
+    protected User getCurrentUser() {
+        final User current = User.current();
+        return current == null ? User.getUnknown() : current;
     }
 
     @CheckForNull

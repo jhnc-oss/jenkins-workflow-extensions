@@ -29,6 +29,7 @@ import com.cloudbees.hudson.plugins.folder.AbstractFolderPropertyDescriptor;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.model.Item;
 import hudson.model.Job;
+import hudson.model.User;
 import hudson.security.Permission;
 import hudson.util.DescribableList;
 import jenkins.branch.MultiBranchProject;
@@ -131,7 +132,7 @@ class BlockPipelineActionTest {
         when(project.getAllJobs()).thenReturn(Collections.emptyList());
         when(project.getProperties()).thenReturn(emptyProjectProperties());
 
-        final BlockPipelineAction action = new BlockPipelineAction(project);
+        final BlockPipelineAction action = createSpy();
         doReturn(formData("")).when(req).getSubmittedForm();
 
         final HttpResponse resp = action.doBlock(req);
@@ -146,7 +147,7 @@ class BlockPipelineActionTest {
         doReturn(properties).when(project).getProperties();
         doReturn(formData("")).when(req).getSubmittedForm();
 
-        final BlockPipelineAction action = new BlockPipelineAction(project);
+        final BlockPipelineAction action = createSpy();
         final HttpResponse resp = action.doBlock(req);
 
         assertThat(resp).isNotNull();
@@ -160,7 +161,7 @@ class BlockPipelineActionTest {
         doReturn(properties).when(project).getProperties();
         doReturn(formData("abc def")).when(req).getSubmittedForm();
 
-        final BlockPipelineAction action = new BlockPipelineAction(project);
+        final BlockPipelineAction action = createSpy();
         final HttpResponse resp = action.doBlock(req);
 
         assertThat(resp).isNotNull();
@@ -170,19 +171,21 @@ class BlockPipelineActionTest {
     }
 
     @Test
-    void blockAddsPropertyWithTimestamp() throws Exception {
+    void blockAddsPropertyWithInfo() throws Exception {
         final Date timestampRef = new Date();
         final DescribableList<AbstractFolderProperty<?>, AbstractFolderPropertyDescriptor> properties = emptyProjectProperties();
         doReturn(properties).when(project).getProperties();
         doReturn(formData("")).when(req).getSubmittedForm();
 
-        final BlockPipelineAction action = new BlockPipelineAction(project);
+        final BlockPipelineAction action = createSpy();
         final HttpResponse resp = action.doBlock(req);
 
         assertThat(resp).isNotNull();
         assertThat(properties).hasSize(1);
         assertThat(properties.get(0)).isInstanceOf(ProjectBlockedProperty.class);
-        assertThat(((ProjectBlockedProperty) properties.get(0)).getTimestamp()).isAtLeast(timestampRef);
+        final ProjectBlockedProperty property = (ProjectBlockedProperty) properties.get(0);
+        assertThat(property.getTimestamp()).isAtLeast(timestampRef);
+        assertThat(property.getUser()).isEqualTo("An UserName");
     }
 
     @Test
@@ -194,7 +197,7 @@ class BlockPipelineActionTest {
         when(job.getProperty(JobBlockedProperty.class)).thenReturn(null, new JobBlockedProperty());
         doReturn(formData("")).when(req).getSubmittedForm();
 
-        final BlockPipelineAction action = new BlockPipelineAction(project);
+        final BlockPipelineAction action = createSpy();
         action.doBlock(req);
         action.doBlock(req);
         action.doBlock(req);
@@ -213,7 +216,7 @@ class BlockPipelineActionTest {
         doReturn(properties).when(project).getProperties();
         doReturn(formData("")).when(req).getSubmittedForm();
 
-        final BlockPipelineAction action = new BlockPipelineAction(project);
+        final BlockPipelineAction action = createSpy();
         final HttpResponse resp = action.doBlock(req);
 
         assertThat(resp).isNotNull();
@@ -356,7 +359,7 @@ class BlockPipelineActionTest {
     }
 
     private DescribableList<AbstractFolderProperty<?>, AbstractFolderPropertyDescriptor> projectProperties() {
-        return new DescribableList<>(project, Collections.singleton(new ProjectBlockedProperty("")));
+        return new DescribableList<>(project, Collections.singleton(new ProjectBlockedProperty("", "user")));
     }
 
     private DescribableList<AbstractFolderProperty<?>, AbstractFolderPropertyDescriptor> emptyProjectProperties() {
@@ -370,5 +373,14 @@ class BlockPipelineActionTest {
     @SafeVarargs
     private final <T> List<T> asList(T... elements) {
         return Arrays.asList(elements);
+    }
+
+    private BlockPipelineAction createSpy() {
+        final User user = mock(User.class);
+        doReturn("An UserName").when(user).getFullName();
+
+        final BlockPipelineAction action = spy(new BlockPipelineAction(project));
+        doReturn(user).when(action).getCurrentUser();
+        return action;
     }
 }
