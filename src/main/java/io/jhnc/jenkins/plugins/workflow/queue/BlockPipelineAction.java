@@ -79,7 +79,7 @@ public class BlockPipelineAction implements Action, StaplerProxy {
     }
 
     public boolean isBlocked() {
-        return project.getProperties().get(ProjectBlockedProperty.class) != null;
+        return getProjectProperty() != null;
     }
 
     @SuppressWarnings("unchecked")
@@ -93,12 +93,14 @@ public class BlockPipelineAction implements Action, StaplerProxy {
 
     @CheckForNull
     public String getMessage() {
-        return isBlocked() ? project.getProperties().get(ProjectBlockedProperty.class).getMessage() : null;
+        final ProjectBlockedProperty property = getProjectProperty();
+        return property != null ? property.getMessage() : null;
     }
 
     @CheckForNull
     public Date getTimestamp() {
-        return isBlocked() ? project.getProperties().get(ProjectBlockedProperty.class).getTimestamp() : null;
+        final ProjectBlockedProperty property = getProjectProperty();
+        return property != null ? property.getTimestamp() : null;
     }
 
     @RequirePOST
@@ -163,6 +165,11 @@ public class BlockPipelineAction implements Action, StaplerProxy {
 
     protected void removeBlockPropertyFromJob(@NonNull Job<?, ?> job) throws IOException {
         job.removeProperty(JobBlockedProperty.class);
+    }
+
+    @CheckForNull
+    private ProjectBlockedProperty getProjectProperty() {
+        return project.getProperties().get(ProjectBlockedProperty.class);
     }
 
 }
