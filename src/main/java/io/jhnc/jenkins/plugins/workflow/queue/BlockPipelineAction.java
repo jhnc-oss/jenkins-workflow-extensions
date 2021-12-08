@@ -45,6 +45,7 @@ import javax.servlet.ServletException;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Date;
+import java.util.function.Function;
 
 public class BlockPipelineAction implements Action, StaplerProxy {
     private static final Permission PERMISSION = Item.CONFIGURE;
@@ -94,20 +95,17 @@ public class BlockPipelineAction implements Action, StaplerProxy {
 
     @CheckForNull
     public String getMessage() {
-        final ProjectBlockedProperty property = getProjectProperty();
-        return property != null ? property.getMessage() : null;
+        return valueOrNull(ProjectBlockedProperty::getMessage);
     }
 
     @CheckForNull
     public Date getTimestamp() {
-        final ProjectBlockedProperty property = getProjectProperty();
-        return property != null ? property.getTimestamp() : null;
+        return valueOrNull(ProjectBlockedProperty::getTimestamp);
     }
 
     @CheckForNull
     public String getUserName() {
-        final ProjectBlockedProperty property = getProjectProperty();
-        return property != null ? property.getUser() : null;
+        return valueOrNull(ProjectBlockedProperty::getUser);
     }
 
     @RequirePOST
@@ -183,6 +181,12 @@ public class BlockPipelineAction implements Action, StaplerProxy {
     @CheckForNull
     private ProjectBlockedProperty getProjectProperty() {
         return project.getProperties().get(ProjectBlockedProperty.class);
+    }
+
+    @CheckForNull
+    private <T> T valueOrNull(@NonNull Function<ProjectBlockedProperty, T> supplier) {
+        final ProjectBlockedProperty property = getProjectProperty();
+        return property == null ? null : supplier.apply(property);
     }
 
 }
