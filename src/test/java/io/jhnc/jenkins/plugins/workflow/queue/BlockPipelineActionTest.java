@@ -44,6 +44,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.access.AccessDeniedException;
 
+import javax.servlet.ServletException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -159,7 +160,7 @@ class BlockPipelineActionTest {
     void blockAddsPropertyWithMessage() throws Exception {
         final DescribableList<AbstractFolderProperty<?>, AbstractFolderPropertyDescriptor> properties = emptyProjectProperties();
         doReturn(properties).when(project).getProperties();
-        doReturn(formData("abc def")).when(req).getSubmittedForm();
+        doReturn(formData("   abc def    ")).when(req).getSubmittedForm();
 
         final BlockPipelineAction action = createSpy();
         final HttpResponse resp = action.doBlock(req);
@@ -167,7 +168,7 @@ class BlockPipelineActionTest {
         assertThat(resp).isNotNull();
         assertThat(properties).hasSize(1);
         assertThat(properties.get(0)).isInstanceOf(ProjectBlockedProperty.class);
-        assertThat(((ProjectBlockedProperty) properties.get(0)).getMessage()).contains("abc def");
+        assertThat(((ProjectBlockedProperty) properties.get(0)).getMessage()).endsWith("abc def");
     }
 
     @Test
@@ -284,6 +285,32 @@ class BlockPipelineActionTest {
         verify(job1).removeProperty(JobBlockedProperty.class);
         verify(job2).removeProperty(JobBlockedProperty.class);
         assertThat(properties).isEmpty();
+    }
+
+    @Test
+    void accessorsReturnNullIfNotBlocked() {
+        when(project.getProperties()).thenReturn(emptyProjectProperties());
+
+        final BlockPipelineAction actionSpy = new BlockPipelineAction(project);
+
+        assertThat(actionSpy.getMessage()).isNull();
+        assertThat(actionSpy.getTimestamp()).isNull();
+        assertThat(actionSpy.getUserName()).isNull();
+    }
+
+    @Test
+    void accessorsReturnsValuesIfBlocked() throws IOException, ServletException {
+        final Date timestampRef = new Date();
+        final DescribableList<AbstractFolderProperty<?>, AbstractFolderPropertyDescriptor> properties = emptyProjectProperties();
+        doReturn(properties).when(project).getProperties();
+        doReturn(formData("abc")).when(req).getSubmittedForm();
+
+        final BlockPipelineAction action = createSpy();
+        action.doBlock(req);
+
+        assertThat(action.getMessage()).isEqualTo("abc");
+        assertThat(action.getTimestamp()).isAtLeast(timestampRef);
+        assertThat(action.getUserName()).isEqualTo("An UserName");
     }
 
     @Test
