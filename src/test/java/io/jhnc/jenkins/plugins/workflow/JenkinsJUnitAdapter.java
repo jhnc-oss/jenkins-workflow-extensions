@@ -53,8 +53,9 @@ public class JenkinsJUnitAdapter {
             final Optional<JenkinsRecipe> jenkinsRecipe = context.findAnnotation(JenkinsRecipe.class);
 
             if (jenkinsRecipe.isPresent()) {
-                @SuppressWarnings("unchecked") final JenkinsRecipe.Runner<JenkinsRecipe> runner = jenkinsRecipe.get().value()
-                        .getDeclaredConstructor().newInstance();
+                @SuppressWarnings("unchecked") final JenkinsRecipe.Runner<JenkinsRecipe> runner =
+                        (JenkinsRecipe.Runner<JenkinsRecipe>) jenkinsRecipe.get().value()
+                                .getDeclaredConstructor().newInstance();
                 recipes.add(runner);
                 tearDowns.add(() -> runner.tearDown(this, jenkinsRecipe.get()));
             }

@@ -113,7 +113,7 @@ class BlockPipelineQueueDispatcherTest {
     @Test
     void blockedProjectIsNotExecuted() {
         final BlockPipelineQueueDispatcher dispatcher = new BlockPipelineQueueDispatcher();
-        when(project.getProperties()).thenReturn(new DescribableList<>(project, Collections.singleton(new ProjectBlockedProperty(""))));
+        when(project.getProperties()).thenReturn(new DescribableList<>(project, Collections.singleton(new ProjectBlockedProperty("", "user"))));
         final WorkflowJob job = new WorkflowJob(project, "x");
         final CauseOfBlockage cause = dispatcher.canRun(createItem(job));
 
@@ -125,7 +125,7 @@ class BlockPipelineQueueDispatcherTest {
     @Test
     void blockedProjectWithCustomMessage() {
         final BlockPipelineQueueDispatcher dispatcher = new BlockPipelineQueueDispatcher();
-        final ProjectBlockedProperty property = new ProjectBlockedProperty("a custom message");
+        final ProjectBlockedProperty property = new ProjectBlockedProperty("a custom message", "user");
         when(project.getProperties()).thenReturn(new DescribableList<>(project, Collections.singleton(property)));
         final WorkflowJob job = new WorkflowJob(project, "x");
         final CauseOfBlockage cause = dispatcher.canRun(createItem(job));

@@ -29,6 +29,7 @@ import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.model.Action;
 import hudson.model.Item;
 import hudson.model.Job;
+import hudson.model.User;
 import hudson.security.Permission;
 import hudson.util.FormApply;
 import hudson.util.FormValidation;
@@ -43,6 +44,8 @@ import org.kohsuke.stapler.interceptor.RequirePOST;
 import javax.servlet.ServletException;
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Date;
+import java.util.function.Function;
 
 public class BlockPipelineAction implements Action, StaplerProxy {
     private static final Permission PERMISSION = Item.CONFIGURE;
@@ -78,7 +81,7 @@ public class BlockPipelineAction implements Action, StaplerProxy {
     }
 
     public boolean isBlocked() {
-        return project.getProperties().get(ProjectBlockedProperty.class) != null;
+        return getProjectProperty() != null;
     }
 
     @SuppressWarnings("unchecked")
@@ -92,7 +95,17 @@ public class BlockPipelineAction implements Action, StaplerProxy {
 
     @CheckForNull
     public String getMessage() {
-        return isBlocked() ? project.getProperties().get(ProjectBlockedProperty.class).getMessage() : null;
+        return valueOrNull(ProjectBlockedProperty::getMessage);
+    }
+
+    @CheckForNull
+    public Date getTimestamp() {
+        return valueOrNull(ProjectBlockedProperty::getTimestamp);
+    }
+
+    @CheckForNull
+    public String getUserName() {
+        return valueOrNull(ProjectBlockedProperty::getUser);
     }
 
     @RequirePOST
@@ -134,7 +147,7 @@ public class BlockPipelineAction implements Action, StaplerProxy {
     }
 
     protected void addBlockProperty(@NonNull String message) throws IOException {
-        project.getProperties().replace(new ProjectBlockedProperty(message));
+        project.getProperties().replace(new ProjectBlockedProperty(message, getCurrentUser().getFullName()));
 
         for (final Job<?, ?> job : project.getAllJobs()) {
             addBlockPropertyToJob(job);
@@ -157,6 +170,23 @@ public class BlockPipelineAction implements Action, StaplerProxy {
 
     protected void removeBlockPropertyFromJob(@NonNull Job<?, ?> job) throws IOException {
         job.removeProperty(JobBlockedProperty.class);
+    }
+
+    @NonNull
+    protected User getCurrentUser() {
+        final User current = User.current();
+        return current == null ? User.getUnknown() : current;
+    }
+
+    @CheckForNull
+    private ProjectBlockedProperty getProjectProperty() {
+        return project.getProperties().get(ProjectBlockedProperty.class);
+    }
+
+    @CheckForNull
+    private <T> T valueOrNull(@NonNull Function<ProjectBlockedProperty, T> supplier) {
+        final ProjectBlockedProperty property = getProjectProperty();
+        return property == null ? null : supplier.apply(property);
     }
 
 }

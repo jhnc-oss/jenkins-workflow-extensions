@@ -4,13 +4,13 @@
     <parent>
         <groupId>org.jenkins-ci.plugins</groupId>
         <artifactId>plugin</artifactId>
-        <version>4.31</version>
+        <version>4.33</version>
         <relativePath />
     </parent>
 
     <groupId>io.jhnc</groupId>
     <artifactId>jenkins-workflow-extensions</artifactId>
-    <version>0.3.3-SNAPSHOT</version>
+    <version>0.3.4-SNAPSHOT</version>
     <packaging>hpi</packaging>
 
     <properties>
@@ -18,7 +18,7 @@
         <java.level>8</java.level>
 
         <junit.version>5.8.2</junit.version>
-        <mockito.version>4.1.0</mockito.version>
+        <mockito.version>4.2.0</mockito.version>
     </properties>
 
     <name>Pipeline Workflow Extensions</name>
@@ -106,7 +106,7 @@
             <dependency>
                 <groupId>io.jenkins.tools.bom</groupId>
                 <artifactId>bom-2.289.x</artifactId>
-                <version>1008.vb9e22885c9cf</version>
+                <version>1090.v0a_33df40457a_</version>
                 <scope>import</scope>
                 <type>pom</type>
             </dependency>

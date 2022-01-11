@@ -23,10 +23,14 @@ SOFTWARE.
 -->
 
 <?jelly escape-by-default='true'?>
-<j:jelly xmlns:j="jelly:core" xmlns:l="/lib/layout" xmlns:f="/lib/form">
+<j:jelly xmlns:j="jelly:core" xmlns:l="/lib/layout" xmlns:f="/lib/form" xmlns:i="jelly:fmt">
     <l:layout title="Block Project">
         <l:main-panel>
             <f:section title="Pipeline"/>
+
+            <j:if test="${it.blocked}">
+                ${%project.info.timestamp} <b><i:formatDate value="${it.timestamp}" type="both" dateStyle="medium" timeStyle="short" /></b> ${%project.info.user} <b>${it.userName}</b>
+            </j:if>
 
             <f:form action="block" name="block" method="post">
                 <f:entry title="${%message.title}" field="message">
