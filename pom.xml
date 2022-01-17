@@ -162,6 +162,14 @@
             <version>31.0.1-jre</version>
             <scope>test</scope>
         </dependency>
+
+        <!-- TODO: Drop once available through BOM (#40) -->
+        <dependency>
+            <groupId>org.jenkins-ci.main</groupId>
+            <artifactId>jenkins-test-harness</artifactId>
+            <version>1690.vfcb_959006c07</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <repositories>
