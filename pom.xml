@@ -17,7 +17,7 @@
         <jenkins.version>2.289.1</jenkins.version>
         <java.level>8</java.level>
 
-        <junit.version>5.8.2</junit.version>
+        <junit.jupiter.version>5.8.2</junit.jupiter.version>
         <mockito.version>4.3.1</mockito.version>
     </properties>
 
@@ -127,13 +127,13 @@
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter</artifactId>
-            <version>${junit.version}</version>
+            <version>${junit.jupiter.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.junit.vintage</groupId>
             <artifactId>junit-vintage-engine</artifactId>
-            <version>${junit.version}</version>
+            <version>${junit.jupiter.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -160,14 +160,6 @@
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
             <version>31.0.1-jre</version>
-            <scope>test</scope>
-        </dependency>
-
-        <!-- TODO: Drop once available through BOM (#40) -->
-        <dependency>
-            <groupId>org.jenkins-ci.main</groupId>
-            <artifactId>jenkins-test-harness</artifactId>
-            <version>1690.vfcb_959006c07</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
