@@ -10,15 +10,15 @@
 
     <groupId>io.jhnc</groupId>
     <artifactId>jenkins-workflow-extensions</artifactId>
-    <version>0.3.4-SNAPSHOT</version>
+    <version>0.3.5-SNAPSHOT</version>
     <packaging>hpi</packaging>
 
     <properties>
         <jenkins.version>2.289.1</jenkins.version>
         <java.level>8</java.level>
 
-        <junit.version>5.8.2</junit.version>
-        <mockito.version>4.2.0</mockito.version>
+        <junit.jupiter.version>5.8.2</junit.jupiter.version>
+        <mockito.version>4.3.1</mockito.version>
     </properties>
 
     <name>Pipeline Workflow Extensions</name>
@@ -106,7 +106,7 @@
             <dependency>
                 <groupId>io.jenkins.tools.bom</groupId>
                 <artifactId>bom-2.289.x</artifactId>
-                <version>1090.v0a_33df40457a_</version>
+                <version>1117.v62a_f6a_01de98</version>
                 <scope>import</scope>
                 <type>pom</type>
             </dependency>
@@ -127,13 +127,13 @@
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter</artifactId>
-            <version>${junit.version}</version>
+            <version>${junit.jupiter.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.junit.vintage</groupId>
             <artifactId>junit-vintage-engine</artifactId>
-            <version>${junit.version}</version>
+            <version>${junit.jupiter.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
