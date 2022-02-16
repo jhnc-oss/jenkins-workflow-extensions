@@ -28,14 +28,15 @@ import com.cloudbees.hudson.plugins.folder.AbstractFolderProperty;
 import com.cloudbees.hudson.plugins.folder.AbstractFolderPropertyDescriptor;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.Extension;
+import hudson.Util;
 import org.jenkinsci.plugins.workflow.multibranch.WorkflowMultiBranchProject;
 
 import java.util.Date;
 
 public class ProjectBlockedProperty extends AbstractFolderProperty<WorkflowMultiBranchProject> {
-    private final String message;
-    private final Date timestamp;
-    private final String user;
+    private String message;
+    private Date timestamp;
+    private String user;
 
     public ProjectBlockedProperty(@NonNull String message, @NonNull String user) {
         this.message = message;
@@ -57,6 +58,15 @@ public class ProjectBlockedProperty extends AbstractFolderProperty<WorkflowMulti
     public String getUser() {
         return user;
     }
+
+    @NonNull
+    protected Object readResolve() {
+        message = Util.fixNull(message, "");
+        timestamp = Util.fixNull(timestamp, new Date(0));
+        user = Util.fixNull(user, "");
+        return this;
+    }
+
 
     @Extension
     public static class DescriptorImpl extends AbstractFolderPropertyDescriptor {
