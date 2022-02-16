@@ -10,7 +10,7 @@
 
     <groupId>io.jhnc</groupId>
     <artifactId>jenkins-workflow-extensions</artifactId>
-    <version>0.3.5</version>
+    <version>0.3.6-SNAPSHOT</version>
     <packaging>hpi</packaging>
 
     <properties>
@@ -36,7 +36,7 @@
         <connection>scm:git:git://github.com/jhnc-oss/${project.artifactId}.git</connection>
         <developerConnection>scm:git:git@github.com:jhnc-oss/${project.artifactId}.git</developerConnection>
         <url>${project.url}</url>
-        <tag>v0.3.5</tag>
+        <tag>HEAD</tag>
     </scm>
 
     <build>
