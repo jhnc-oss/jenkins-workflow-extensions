@@ -110,6 +110,7 @@ public class BlockPipelineAction implements Action, StaplerProxy {
 
     @RequirePOST
     public HttpResponse doBlockJob(@NonNull StaplerRequest req) throws IOException {
+        checkPermission();
         final String jobName = req.getParameter("job");
         final WorkflowJob job = project.getJob(jobName);
 
@@ -123,6 +124,7 @@ public class BlockPipelineAction implements Action, StaplerProxy {
 
     @RequirePOST
     public HttpResponse doUnblockJob(@NonNull StaplerRequest req) throws IOException {
+        checkPermission();
         final String jobName = req.getParameter("job");
         final WorkflowJob job = project.getJob(jobName);
 
@@ -136,12 +138,14 @@ public class BlockPipelineAction implements Action, StaplerProxy {
 
     @RequirePOST
     public HttpResponse doBlock(@NonNull StaplerRequest req) throws IOException, ServletException {
+        checkPermission();
         addBlockProperty(req.getSubmittedForm().getString("message").trim());
         return FormApply.success(".");
     }
 
     @RequirePOST
     public HttpResponse doUnblock(@NonNull StaplerRequest req) throws IOException {
+        checkPermission();
         removeBlockProperty();
         return FormApply.success(".");
     }
@@ -176,6 +180,10 @@ public class BlockPipelineAction implements Action, StaplerProxy {
     protected User getCurrentUser() {
         final User current = User.current();
         return current == null ? User.getUnknown() : current;
+    }
+
+    private void checkPermission() {
+        project.checkPermission(PERMISSION);
     }
 
     @CheckForNull

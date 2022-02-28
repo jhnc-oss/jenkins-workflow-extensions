@@ -129,6 +129,19 @@ class BlockPipelineActionTest {
     }
 
     @Test
+    void blockChecksPermission() throws ServletException, IOException {
+        when(project.getAllJobs()).thenReturn(Collections.emptyList());
+        when(project.getProperties()).thenReturn(emptyProjectProperties());
+
+        final BlockPipelineAction action = createSpy();
+        doReturn(formData("")).when(req).getSubmittedForm();
+
+        final HttpResponse resp = action.doBlock(req);
+        assertThat(resp).isNotNull();
+        verify(project).checkPermission(Item.CONFIGURE);
+    }
+
+    @Test
     void blockDoesNothingIfNoJobAvailable() throws Exception {
         when(project.getAllJobs()).thenReturn(Collections.emptyList());
         when(project.getProperties()).thenReturn(emptyProjectProperties());
@@ -225,6 +238,18 @@ class BlockPipelineActionTest {
         verify(job1).addProperty(any(JobBlockedProperty.class));
         verify(job2).addProperty(any(JobBlockedProperty.class));
         assertThat(properties).hasSize(1);
+    }
+
+    @Test
+    void unblockChecksPermission() throws IOException {
+        when(project.getAllJobs()).thenReturn(Collections.emptyList());
+        when(project.getProperties()).thenReturn(emptyProjectProperties());
+
+        final BlockPipelineAction action = new BlockPipelineAction(project);
+        final HttpResponse resp = action.doUnblock(req);
+
+        assertThat(resp).isNotNull();
+        verify(project).checkPermission(Item.CONFIGURE);
     }
 
     @Test
@@ -326,6 +351,16 @@ class BlockPipelineActionTest {
     }
 
     @Test
+    void blockJobChecksPermission() throws IOException {
+        when(req.getParameter("job")).thenReturn("not-existing-job");
+        final BlockPipelineAction actionSpy = spy(new BlockPipelineAction(project));
+
+        final HttpResponse resp = actionSpy.doBlockJob(req);
+        assertThat(resp).isNotNull();
+        verify(project).checkPermission(Item.CONFIGURE);
+    }
+
+    @Test
     void blockJobBlockJobsIfAvailable() throws IOException {
         final WorkflowJob job = new WorkflowJob(project, "test-0");
         when(req.getParameter("job")).thenReturn("test-0");
@@ -354,6 +389,16 @@ class BlockPipelineActionTest {
 
         final HttpResponse resp = actionSpy.doBlockJob(req);
         assertThat(resp).isNotNull();
+    }
+
+    @Test
+    void unblockJobChecksPermission() throws IOException {
+        when(req.getParameter("job")).thenReturn("not-existing-job");
+        final BlockPipelineAction actionSpy = spy(new BlockPipelineAction(project));
+
+        final HttpResponse resp = actionSpy.doUnblockJob(req);
+        assertThat(resp).isNotNull();
+        verify(project).checkPermission(Item.CONFIGURE);
     }
 
     @Test
