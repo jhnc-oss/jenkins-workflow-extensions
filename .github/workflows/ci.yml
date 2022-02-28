@@ -15,3 +15,10 @@ jobs:
         with:
           java-version: ${{ matrix.java }}
           pmd: true
+
+  jenkins-security-scan:
+    uses: jenkins-infra/jenkins-security-scan/.github/workflows/jenkins-security-scan.yaml@v1
+    name: jenkins-security-scan
+    with:
+      java-cache: 'maven'
+      java-version: 11
