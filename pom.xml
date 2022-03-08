@@ -148,7 +148,6 @@
         </dependency>
     </dependencies>
 
-
     <!-- (#27) Workaround for JDK-17 -->
     <profiles>
         <profile>
@@ -168,13 +167,6 @@
                     </plugin>
                 </plugins>
             </build>
-            <dependencies>
-                <dependency>
-                    <groupId>com.google.inject</groupId>
-                    <artifactId>guice</artifactId>
-                    <version>5.1.0</version>
-                </dependency>
-            </dependencies>
         </profile>
     </profiles>
 
