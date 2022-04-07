@@ -15,7 +15,6 @@
 
     <properties>
         <jenkins.version>2.332.1</jenkins.version>
-        <java.level>8</java.level>
 
         <junit.jupiter.version>5.8.2</junit.jupiter.version>
         <mockito.version>4.4.0</mockito.version>
