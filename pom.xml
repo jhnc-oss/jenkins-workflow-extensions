@@ -21,7 +21,6 @@
     </properties>
 
     <name>Pipeline Workflow Extensions</name>
-    <description>Extensions for the Pipeline Workflow.</description>
 
     <licenses>
         <license>
