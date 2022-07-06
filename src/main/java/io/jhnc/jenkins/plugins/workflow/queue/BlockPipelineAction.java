@@ -59,7 +59,7 @@ public class BlockPipelineAction implements Action, StaplerProxy {
     @CheckForNull
     @Override
     public String getIconFileName() {
-        return project.hasPermission(PERMISSION) ? "/plugin/jenkins-workflow-extensions/images/lock.png" : null;
+        return project.hasPermission(PERMISSION) ? "/plugin/jenkins-workflow-extensions/images/lock.svg" : null;
     }
 
     @CheckForNull
