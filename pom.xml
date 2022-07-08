@@ -146,28 +146,6 @@
         </dependency>
     </dependencies>
 
-    <!-- (#27) Workaround for JDK-17 -->
-    <profiles>
-        <profile>
-            <id>jdk17</id>
-            <activation>
-                <jdk>17</jdk>
-            </activation>
-            <build>
-                <plugins>
-                    <plugin>
-                        <artifactId>maven-surefire-plugin</artifactId>
-                        <configuration>
-                            <argLine>
-                                --add-opens java.base/java.util=ALL-UNNAMED
-                            </argLine>
-                        </configuration>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-    </profiles>
-
     <repositories>
         <repository>
             <id>repo.jenkins-ci.org</id>
