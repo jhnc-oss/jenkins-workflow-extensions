@@ -10,7 +10,7 @@
 
     <groupId>io.jhnc</groupId>
     <artifactId>jenkins-workflow-extensions</artifactId>
-    <version>0.4.2-SNAPSHOT</version>
+    <version>0.4.3-SNAPSHOT</version>
     <packaging>hpi</packaging>
 
     <properties>
