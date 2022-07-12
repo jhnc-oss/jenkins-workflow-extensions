@@ -4,6 +4,11 @@ on:
   schedule:
     - cron: '0 5 * * 3'
 
+permissions:
+  security-events: write
+  contents: read
+  actions: read
+
 jobs:
   jenkins-security-scan:
     uses: jenkins-infra/jenkins-security-scan/.github/workflows/jenkins-security-scan.yaml@main
