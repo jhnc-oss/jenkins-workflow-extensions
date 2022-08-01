@@ -26,7 +26,6 @@ package io.jhnc.jenkins.plugins.workflow.queue;
 
 import com.gargoylesoftware.htmlunit.FailingHttpStatusCodeException;
 import hudson.scm.NullSCM;
-import io.jhnc.jenkins.plugins.test.EnableJenkins;
 import jenkins.branch.Branch;
 import jenkins.branch.MultiBranchProject;
 import jenkins.scm.api.SCMHead;
@@ -36,6 +35,7 @@ import org.jenkinsci.plugins.workflow.multibranch.WorkflowMultiBranchProject;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.jvnet.hudson.test.JenkinsRule;
+import org.jvnet.hudson.test.junit.jupiter.WithJenkins;
 
 import java.io.IOException;
 import java.util.Collections;
@@ -44,7 +44,7 @@ import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @Tag("IT")
-@EnableJenkins
+@WithJenkins
 public class BlockPipelineActionAccessTest {
     @Test
     void blockAndUnblockFailWithoutPost(JenkinsRule r) throws IOException {
