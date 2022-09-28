@@ -14,7 +14,7 @@
     <packaging>hpi</packaging>
 
     <properties>
-        <jenkins.version>2.346.1</jenkins.version>
+        <jenkins.version>2.361.1</jenkins.version>
 
         <mockito.version>4.8.0</mockito.version>
     </properties>
@@ -94,7 +94,7 @@
         <dependencies>
             <dependency>
                 <groupId>io.jenkins.tools.bom</groupId>
-                <artifactId>bom-2.346.x</artifactId>
+                <artifactId>bom-2.361.x</artifactId>
                 <version>1607.va_c1576527071</version>
                 <scope>import</scope>
                 <type>pom</type>
