@@ -50,7 +50,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
-import java.util.List;
 
 import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -122,7 +121,7 @@ class BlockPipelineActionTest {
     void getJobsReturnsAllJobsOfTheProject() {
         final Job<?, ?> job0 = mock(Job.class);
         final Job<?, ?> job1 = mock(Job.class);
-        when(project.getAllJobs()).thenAnswer(x -> asList(job0, job1));
+        when(project.getAllJobs()).thenAnswer(x -> Arrays.asList(job0, job1));
 
         final BlockPipelineAction action = new BlockPipelineAction(project);
         assertThat(action.getJobs()).containsExactly(job0, job1);
@@ -156,7 +155,7 @@ class BlockPipelineActionTest {
     @Test
     void blockAddsProperty() throws Exception {
         final Job<?, ?> job = mock(Job.class);
-        when(project.getAllJobs()).thenAnswer(x -> asList(job));
+        when(project.getAllJobs()).thenAnswer(x -> Collections.singletonList(job));
         final DescribableList<AbstractFolderProperty<?>, AbstractFolderPropertyDescriptor> properties = emptyProjectProperties();
         doReturn(properties).when(project).getProperties();
         doReturn(formData("")).when(req).getSubmittedForm();
@@ -205,7 +204,7 @@ class BlockPipelineActionTest {
     @Test
     void blockAddsPropertyOnlyOnce() throws Exception {
         final Job<?, ?> job = mock(Job.class);
-        when(project.getAllJobs()).thenAnswer(x -> asList(job));
+        when(project.getAllJobs()).thenAnswer(x -> Collections.singletonList(job));
         final DescribableList<AbstractFolderProperty<?>, AbstractFolderPropertyDescriptor> properties = emptyProjectProperties();
         doReturn(properties).when(project).getProperties();
         when(job.getProperty(JobBlockedProperty.class)).thenReturn(null, new JobBlockedProperty());
@@ -225,7 +224,7 @@ class BlockPipelineActionTest {
         final Job<?, ?> job0 = mock(Job.class);
         final Job<?, ?> job1 = mock(Job.class);
         final Job<?, ?> job2 = mock(Job.class);
-        when(project.getAllJobs()).thenAnswer(x -> asList(job0, job1, job2));
+        when(project.getAllJobs()).thenAnswer(x -> Arrays.asList(job0, job1, job2));
         final DescribableList<AbstractFolderProperty<?>, AbstractFolderPropertyDescriptor> properties = emptyProjectProperties();
         doReturn(properties).when(project).getProperties();
         doReturn(formData("")).when(req).getSubmittedForm();
@@ -282,7 +281,7 @@ class BlockPipelineActionTest {
     void unblockRemovesProperty() throws IOException {
         final Job<?, ?> job = mock(Job.class);
         final DescribableList<AbstractFolderProperty<?>, AbstractFolderPropertyDescriptor> properties = projectProperties();
-        when(project.getAllJobs()).thenAnswer(x -> asList(job));
+        when(project.getAllJobs()).thenAnswer(x -> Collections.singletonList(job));
         when(project.getProperties()).thenReturn(properties);
 
         final BlockPipelineAction action = new BlockPipelineAction(project);
@@ -299,7 +298,7 @@ class BlockPipelineActionTest {
         final Job<?, ?> job1 = mock(Job.class);
         final Job<?, ?> job2 = mock(Job.class);
         final DescribableList<AbstractFolderProperty<?>, AbstractFolderPropertyDescriptor> properties = projectProperties();
-        when(project.getAllJobs()).thenAnswer(x -> asList(job0, job1, job2));
+        when(project.getAllJobs()).thenAnswer(x -> Arrays.asList(job0, job1, job2));
         when(project.getProperties()).thenReturn(properties);
 
         final BlockPipelineAction action = new BlockPipelineAction(project);
@@ -440,11 +439,6 @@ class BlockPipelineActionTest {
 
     private JSONObject formData(@NonNull String message) {
         return new JSONObject().element("message", message);
-    }
-
-    @SafeVarargs
-    private final <T> List<T> asList(T... elements) {
-        return Arrays.asList(elements);
     }
 
     private BlockPipelineAction createSpy() {

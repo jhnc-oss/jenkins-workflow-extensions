@@ -47,7 +47,7 @@ class BlockPipelineActionFactoryTest {
     void createForCreatesActionsForProject() {
         final BlockPipelineActionFactory factory = new BlockPipelineActionFactory();
         final WorkflowMultiBranchProject project = mock(WorkflowMultiBranchProject.class);
-        Collection<? extends Action> actions = factory.createFor(project);
+        final Collection<? extends Action> actions = factory.createFor(project);
 
         assertThat(actions).hasSize(1);
         assertThat(actions.iterator().next()).isInstanceOf(BlockPipelineAction.class);
