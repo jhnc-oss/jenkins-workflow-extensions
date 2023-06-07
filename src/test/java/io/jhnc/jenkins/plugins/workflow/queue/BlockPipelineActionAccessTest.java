@@ -24,11 +24,11 @@
 
 package io.jhnc.jenkins.plugins.workflow.queue;
 
-import com.gargoylesoftware.htmlunit.FailingHttpStatusCodeException;
 import hudson.scm.NullSCM;
 import jenkins.branch.Branch;
 import jenkins.branch.MultiBranchProject;
 import jenkins.scm.api.SCMHead;
+import org.htmlunit.FailingHttpStatusCodeException;
 import org.jenkinsci.plugins.workflow.job.WorkflowJob;
 import org.jenkinsci.plugins.workflow.job.WorkflowRun;
 import org.jenkinsci.plugins.workflow.multibranch.WorkflowMultiBranchProject;
