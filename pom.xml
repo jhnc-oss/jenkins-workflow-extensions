@@ -14,7 +14,7 @@
     <packaging>hpi</packaging>
 
     <properties>
-        <jenkins.version>2.401.1</jenkins.version>
+        <jenkins.version>2.414.3</jenkins.version>
     </properties>
 
     <name>Pipeline Workflow Extensions</name>
@@ -92,7 +92,7 @@
         <dependencies>
             <dependency>
                 <groupId>io.jenkins.tools.bom</groupId>
-                <artifactId>bom-2.401.x</artifactId>
+                <artifactId>bom-2.414.x</artifactId>
                 <version>2671.va_73a_b_4c103fb_</version>
                 <scope>import</scope>
                 <type>pom</type>
