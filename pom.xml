@@ -137,13 +137,6 @@
             <artifactId>mockito-junit-jupiter</artifactId>
             <scope>test</scope>
         </dependency>
-
-        <!-- Workaround for broken dependency of workflow-cps; remove once shipped automatically -->
-        <dependency>
-            <groupId>org.jenkins-ci.plugins.workflow</groupId>
-            <artifactId>workflow-cps</artifactId>
-            <version>3943.v3519a_3260660</version>
-        </dependency>
     </dependencies>
 
     <repositories>
