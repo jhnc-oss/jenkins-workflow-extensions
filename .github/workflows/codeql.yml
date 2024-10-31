@@ -21,6 +21,10 @@ jobs:
           java-version: 21
           distribution: 'temurin'
           cache: 'maven'
+      - name: 'Setup Maven'
+        uses: stCarolas/setup-maven@v5
+        with:
+          maven-version: 3.9.9
       - name: CodeQL Initialization
         uses: github/codeql-action/init@v3
         with:
