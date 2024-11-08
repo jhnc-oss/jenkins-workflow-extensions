@@ -33,15 +33,15 @@ import hudson.model.User;
 import hudson.security.Permission;
 import hudson.util.FormApply;
 import hudson.util.FormValidation;
+import jakarta.servlet.ServletException;
 import jenkins.branch.MultiBranchProject;
 import org.jenkinsci.plugins.workflow.job.WorkflowJob;
 import org.jenkinsci.plugins.workflow.job.WorkflowRun;
 import org.kohsuke.stapler.HttpResponse;
 import org.kohsuke.stapler.StaplerProxy;
-import org.kohsuke.stapler.StaplerRequest;
+import org.kohsuke.stapler.StaplerRequest2;
 import org.kohsuke.stapler.interceptor.RequirePOST;
 
-import javax.servlet.ServletException;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Date;
@@ -109,7 +109,7 @@ public class BlockPipelineAction implements Action, StaplerProxy {
     }
 
     @RequirePOST
-    public HttpResponse doBlockJob(@NonNull StaplerRequest req) throws IOException {
+    public HttpResponse doBlockJob(@NonNull StaplerRequest2 req) throws IOException {
         checkPermission();
         final String jobName = req.getParameter("job");
         final WorkflowJob job = project.getJob(jobName);
@@ -123,7 +123,7 @@ public class BlockPipelineAction implements Action, StaplerProxy {
     }
 
     @RequirePOST
-    public HttpResponse doUnblockJob(@NonNull StaplerRequest req) throws IOException {
+    public HttpResponse doUnblockJob(@NonNull StaplerRequest2 req) throws IOException {
         checkPermission();
         final String jobName = req.getParameter("job");
         final WorkflowJob job = project.getJob(jobName);
@@ -137,14 +137,14 @@ public class BlockPipelineAction implements Action, StaplerProxy {
     }
 
     @RequirePOST
-    public HttpResponse doBlock(@NonNull StaplerRequest req) throws IOException, ServletException {
+    public HttpResponse doBlock(@NonNull StaplerRequest2 req) throws IOException, ServletException {
         checkPermission();
         addBlockProperty(req.getSubmittedForm().getString("message").trim());
         return FormApply.success(".");
     }
 
     @RequirePOST
-    public HttpResponse doUnblock(@NonNull StaplerRequest req) throws IOException {
+    public HttpResponse doUnblock(@NonNull StaplerRequest2 req) throws IOException {
         checkPermission();
         removeBlockProperty();
         return FormApply.success(".");
