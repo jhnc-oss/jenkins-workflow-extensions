@@ -32,6 +32,7 @@ import hudson.model.Job;
 import hudson.model.User;
 import hudson.security.Permission;
 import hudson.util.DescribableList;
+import jakarta.servlet.ServletException;
 import jenkins.branch.MultiBranchProject;
 import net.sf.json.JSONObject;
 import org.jenkinsci.plugins.workflow.job.WorkflowJob;
@@ -39,12 +40,11 @@ import org.jenkinsci.plugins.workflow.job.WorkflowRun;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.kohsuke.stapler.HttpResponse;
-import org.kohsuke.stapler.StaplerRequest;
+import org.kohsuke.stapler.StaplerRequest2;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.access.AccessDeniedException;
 
-import javax.servlet.ServletException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -67,7 +67,7 @@ class BlockPipelineActionTest {
     @Mock
     MultiBranchProject<WorkflowJob, WorkflowRun> project;
     @Mock
-    StaplerRequest req;
+    StaplerRequest2 req;
 
 
     @Test
