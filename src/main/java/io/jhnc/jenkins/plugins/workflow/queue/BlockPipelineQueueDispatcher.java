@@ -39,9 +39,7 @@ public class BlockPipelineQueueDispatcher extends QueueTaskDispatcher {
     @CheckForNull
     @Override
     public CauseOfBlockage canRun(Queue.Item item) {
-        if (item.task instanceof Job) {
-            final Job<?, ?> job = (Job<?, ?>) item.task;
-
+        if (item.task instanceof Job<?, ?> job) {
             if (isBlocked(job)) {
                 final ProjectBlockedProperty property = getProjectProperty(job);
                 return new JobBlockedCause(property == null ? null : property.getMessage());
