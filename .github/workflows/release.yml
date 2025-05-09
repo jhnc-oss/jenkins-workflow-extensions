@@ -14,12 +14,12 @@ jobs:
     name: "release hpi"
     steps:
       - name: Build
-        uses: offa/maven-action@main
+        uses: offa/maven-action@b7dae834b573acb03563f025fbf9f91cf3d61d96
         with:
           java-version: 17
           pmd: false
       - name: Release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@39ba0b9d81217c984acfad95ddcc7db226387497
         if: startsWith(github.ref, 'refs/tags/')
         with:
           files: target/*.hpi

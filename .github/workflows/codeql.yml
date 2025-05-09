@@ -18,18 +18,10 @@ jobs:
     runs-on: ubuntu-latest
     name: "CodeQL"
     steps:
-      - name: Checkout
-        uses: actions/checkout@main
-      - name: Setup JDK
-        uses: actions/setup-java@main
+      - name: Build
+        uses: offa/maven-action@b7dae834b573acb03563f025fbf9f91cf3d61d96
         with:
           java-version: 21
-          distribution: 'temurin'
-          cache: 'maven'
-      - name: 'Setup Maven'
-        uses: stCarolas/setup-maven@v5
-        with:
-          maven-version: 3.9.9
       - name: CodeQL Initialization
         uses: github/codeql-action/init@v3
         with:
