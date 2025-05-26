@@ -19,7 +19,7 @@ jobs:
     name: "CodeQL"
     steps:
       - name: Build
-        uses: offa/maven-action@b7dae834b573acb03563f025fbf9f91cf3d61d96
+        uses: offa/maven-action@ca18c9443a0f151e1e335d06aaab447a9e84a5e7
         with:
           java-version: 21
       - name: CodeQL Initialization
