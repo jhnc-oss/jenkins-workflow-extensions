@@ -19,7 +19,7 @@ jobs:
           java-version: 17
           pmd: false
       - name: Release
-        uses: softprops/action-gh-release@f0b3259de20cfa7751a020162b49d79d4fd66a77
+        uses: softprops/action-gh-release@126b1e70939461ae1dc0252ce412cabf99778520
         if: startsWith(github.ref, 'refs/tags/')
         with:
           files: target/*.hpi
