@@ -23,10 +23,10 @@ jobs:
         with:
           java-version: 21
       - name: CodeQL Initialization
-        uses: github/codeql-action/init@v3
+        uses: github/codeql-action/init@v4
         with:
           languages: java, actions
           queries: +security-and-quality
           build-mode: none
       - name: CodeQL Analysis
-        uses: github/codeql-action/analyze@v3
+        uses: github/codeql-action/analyze@v4
