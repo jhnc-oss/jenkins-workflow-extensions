@@ -14,7 +14,7 @@ jobs:
     name: "release hpi"
     steps:
       - name: Build
-        uses: offa/maven-action@9f5d347be226bdc684c2a44182fd19b2e8169442
+        uses: offa/maven-action@c667d622234c5df724ba5bdfd4130f8b1c293f2d
         with:
           java-version: 17
           pmd: false
