@@ -15,6 +15,7 @@
 
     <properties>
         <jenkins.version>2.492.3</jenkins.version>
+        <hpi.strictBundleArtifacts>true</hpi.strictBundleArtifacts>
     </properties>
 
     <name>Pipeline Workflow Extensions</name>
