@@ -18,8 +18,14 @@ jobs:
         with:
           java-version: 21
           pmd: false
+      - name: Checksum
+        run: |
+          cd target/
+          for f in *.hpi; do sha256sum "$f" | tee "$f.sha256"; done
       - name: Release
         uses: softprops/action-gh-release@718ea10b132b3b2eba29c1007bb80653f286566b
-        if: startsWith(github.ref, 'refs/tags/')
+        if: github.ref_type == 'tag'
         with:
-          files: target/*.hpi
+          files: |
+            target/*.hpi
+            target/*.hpi.sha256
