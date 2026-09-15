@@ -15,7 +15,7 @@ permissions:
 
 jobs:
   jenkins-security-scan:
-    uses: jenkins-infra/jenkins-security-scan/.github/workflows/jenkins-security-scan.yaml@main
+    uses: jenkins-infra/jenkins-security-scan/.github/workflows/jenkins-security-scan.yaml@da7438f10fecc21e40174d420ef34daae0874122
     name: jenkins-security-scan
     with:
       java-cache: 'maven'
