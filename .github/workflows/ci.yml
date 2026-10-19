@@ -15,7 +15,7 @@ jobs:
     name: jdk-${{ matrix.java }}
     steps:
       - name: Build
-        uses: offa/maven-action@6ae95407e3764dbe8a6402cc485cb46702320fe0
+        uses: offa/maven-action@1d0ec88d20ef83a5814d041d376760970324aab4
         with:
           java-version: ${{ matrix.java }}
           pmd: true
