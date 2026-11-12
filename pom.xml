@@ -14,7 +14,7 @@
     <packaging>hpi</packaging>
 
     <properties>
-        <jenkins.version>2.555.1</jenkins.version>
+        <jenkins.version>2.555.3</jenkins.version>
         <hpi.strictBundleArtifacts>true</hpi.strictBundleArtifacts>
     </properties>
 
